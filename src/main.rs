@@ -34,8 +34,8 @@ fn main() {
         direction: na::vector![1.0, 1.0, 1.0],
     };
 
-    println!("{}", sphere);
-    println!("{}", ray);
+    println!("{:?}", sphere);
+    println!("{:?}", ray);
 
     match sphere.intersects(ray) {
         Some(t) => println!("Distance: {}", t),

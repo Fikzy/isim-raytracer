@@ -5,6 +5,7 @@ pub trait TextureMaterialTrait {
     fn find(&self, point: Point3<f32>) -> (f32, f32, f32);
 }
 
+#[derive(Debug)]
 pub struct UniformTexture {
     pub kd: f32,
     pub ks: f32,
