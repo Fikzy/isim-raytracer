@@ -1,9 +1,7 @@
 extern crate nalgebra as na;
 use na::Point3;
 
-pub trait TextureMaterialTrait {
-    fn find(&self, point: Point3<f32>) -> (f32, f32, f32);
-}
+use crate::texture::TextureMaterialTrait;
 
 #[derive(Debug)]
 pub struct UniformTexture {

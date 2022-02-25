@@ -17,11 +17,11 @@ fn main() {
 
     img.save("test.ppm").unwrap();
 
-    let sphere = object::Sphere {
+    let sphere = object::sphere::Sphere {
         center: na::point![2.0, 2.0, 2.0],
         radius: 1.0,
         object: object::SceneObject {
-            texture: texture::UniformTexture {
+            texture: texture::uniform::UniformTexture {
                 kd: 0.0,
                 ks: 0.0,
                 ka: 0.0,
