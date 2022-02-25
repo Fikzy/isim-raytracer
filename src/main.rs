@@ -1,5 +1,6 @@
 extern crate nalgebra as na;
 
+mod camera;
 mod light;
 mod object;
 mod ray;
