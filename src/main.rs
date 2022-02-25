@@ -6,7 +6,7 @@ mod object;
 mod ray;
 mod texture;
 
-use object::SceneObjectTrait;
+use object::ObjectTrait;
 
 fn main() {
     let img = image::ImageBuffer::from_fn(32, 32, |x, y| {
@@ -22,7 +22,7 @@ fn main() {
     let sphere = object::sphere::Sphere {
         center: na::point![2.0, 2.0, 2.0],
         radius: 1.0,
-        object: object::SceneObject {
+        object: object::Object {
             texture: texture::uniform::UniformTexture {
                 kd: 0.0,
                 ks: 0.0,

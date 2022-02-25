@@ -7,12 +7,12 @@ use crate::texture::TextureMaterialTrait;
 
 #[derive(Debug)]
 pub struct Sphere<T: TextureMaterialTrait> {
-    pub object: object::SceneObject<T>,
+    pub object: object::Object<T>,
     pub center: Point3<f32>,
     pub radius: f32,
 }
 
-impl<T> object::SceneObjectTrait for Sphere<T>
+impl<T> object::ObjectTrait for Sphere<T>
 where
     T: TextureMaterialTrait,
 {
