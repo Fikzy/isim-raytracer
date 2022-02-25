@@ -1,16 +1,18 @@
 extern crate nalgebra as na;
-use na::Vector3;
+use na::Point3;
 
 pub trait TextureMaterialTrait {
-    fn find_pos(&self, pos: Vector3<f32>) -> (f32, f32, f32);
+    fn find(&self, point: Point3<f32>) -> (f32, f32, f32);
 }
 
 pub struct UniformTexture {
-    // texture?
+    pub kd: f32,
+    pub ks: f32,
+    pub ka: f32,
 }
 
 impl TextureMaterialTrait for UniformTexture {
-    fn find_pos(&self, _pos: Vector3<f32>) -> (f32, f32, f32) {
-        (0.0, 0.0, 0.0) // retrieve (kd, ks, ka?) from texture using pos
+    fn find(&self, _point: Point3<f32>) -> (f32, f32, f32) {
+        (self.kd, self.ks, self.ka)
     }
 }

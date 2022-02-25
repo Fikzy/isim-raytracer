@@ -1,5 +1,7 @@
 use object::SceneObjectTrait;
 
+extern crate nalgebra as na;
+
 mod object;
 mod ray;
 mod texture;
@@ -14,4 +16,29 @@ fn main() {
     });
 
     img.save("test.ppm").unwrap();
+
+    let sphere = object::Sphere {
+        center: na::point![2.0, 2.0, 2.0],
+        radius: 1.0,
+        object: object::SceneObject {
+            texture: texture::UniformTexture {
+                kd: 0.0,
+                ks: 0.0,
+                ka: 0.0,
+            },
+        },
+    };
+
+    let ray = ray::Ray {
+        origin: na::point![0.0, 0.0, 0.0],
+        direction: na::vector![1.0, 1.0, 1.0],
+    };
+
+    println!("{}", sphere);
+    println!("{}", ray);
+
+    match sphere.intersects(ray) {
+        Some(t) => println!("Distance: {}", t),
+        None => println!("No intersection"),
+    }
 }
