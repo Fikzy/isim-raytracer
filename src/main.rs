@@ -1,10 +1,11 @@
-use object::SceneObjectTrait;
-
 extern crate nalgebra as na;
 
+mod light;
 mod object;
 mod ray;
 mod texture;
+
+use object::SceneObjectTrait;
 
 fn main() {
     let img = image::ImageBuffer::from_fn(32, 32, |x, y| {
