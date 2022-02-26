@@ -1,20 +1,20 @@
 extern crate nalgebra as na;
 use na::{Point3, Vector3};
 
-use crate::object;
+use crate::object::Object;
 use crate::ray::Ray;
-use crate::texture::TextureMaterialTrait;
+use crate::texture::TextureMaterial;
 
 #[derive(Debug)]
-pub struct Sphere<T: TextureMaterialTrait> {
-    pub object: object::Object<T>,
+pub struct Sphere<T: TextureMaterial> {
     pub center: Point3<f32>,
     pub radius: f32,
+    pub texture: T,
 }
 
-impl<T> object::ObjectTrait for Sphere<T>
+impl<T> Object for Sphere<T>
 where
-    T: TextureMaterialTrait,
+    T: TextureMaterial,
 {
     fn intersects(&self, ray: Ray) -> Option<f32> {
         let oc = ray.origin - self.center;
@@ -38,6 +38,6 @@ where
         (self.center - point).normalize()
     }
     fn find_texture(&self, point: Point3<f32>) -> (f32, f32, f32) {
-        self.object.texture.find(point)
+        self.texture.find(point)
     }
 }
