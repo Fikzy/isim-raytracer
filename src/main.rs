@@ -4,6 +4,7 @@ mod camera;
 mod light;
 mod object;
 mod ray;
+mod scene;
 mod texture;
 
 use crate::object::Object;
