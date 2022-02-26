@@ -1,4 +1,5 @@
 extern crate nalgebra as na;
+use image::Rgb;
 use na::{Point3, Vector3};
 
 use crate::object::Object;
@@ -16,7 +17,7 @@ impl<T> Object for Sphere<T>
 where
     T: TextureMaterial,
 {
-    fn intersects(&self, ray: Ray) -> Option<f32> {
+    fn intersects(&self, ray: &Ray) -> Option<f32> {
         let oc = ray.origin - self.center;
 
         let a = ray.direction.dot(&ray.direction);
@@ -39,5 +40,8 @@ where
     }
     fn find_texture(&self, point: Point3<f32>) -> (f32, f32, f32) {
         self.texture.find(point)
+    }
+    fn get_color(&self) -> Rgb<u8> {
+        self.texture.color()
     }
 }
