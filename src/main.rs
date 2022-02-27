@@ -20,7 +20,7 @@ fn main() {
                 radius: 0.5,
                 texture: texture::uniform::UniformTexture {
                     kd: 1.0,
-                    ks: 1.0,
+                    ks: 0.1,
                     ka: 1.0,
                     color: image::Rgb([66, 135, 245]),
                 },
@@ -30,7 +30,7 @@ fn main() {
                 radius: 2.0,
                 texture: texture::uniform::UniformTexture {
                     kd: 1.0,
-                    ks: 1.0,
+                    ks: 0.1,
                     ka: 1.0,
                     color: image::Rgb([227, 66, 245]),
                 },

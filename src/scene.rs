@@ -59,18 +59,24 @@ impl Scene {
                             direction: (light.get_position() - inter_p).normalize(),
                         };
 
-                        if self.cast_ray(&light_ray).is_some() {
-                            continue;
-                        }
+                        let n = obj.normal(inter_p);
 
-                        let kd = obj.get_diffusion(inter_p);
-                        let mut c = obj.get_color(inter_p);
-                        let nl = obj.normal(inter_p).dot(&light_ray.direction);
+                        let d = inter_p - ray.origin;
+                        let s = d - 2.0 * (d.dot(&n)) * n;
+
+                        let (kd, ks, _ka) = obj.get_properties(inter_p);
+                        let mut color = obj.get_color(inter_p);
+                        let nl = n.dot(&light_ray.direction);
                         let li = light.get_intensity();
 
-                        c.apply(|f| ((kd * f as f32 * nl * li) as u8).clamp(0, 255));
+                        let id = kd * nl * li;
+                        let is = ks * li * s.dot(&light_ray.direction).powi(3);
 
-                        img.put_pixel(x, y, c);
+                        let i = id + is;
+
+                        color.apply(|c| ((c as f32 * i) as u8).clamp(0, 255));
+
+                        img.put_pixel(x, y, color);
                     }
                 }
             }

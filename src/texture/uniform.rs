@@ -14,10 +14,10 @@ pub struct UniformTexture {
 }
 
 impl TextureMaterial for UniformTexture {
-    fn color(&self, _point: Point3<f32>) -> Rgb<u8> {
+    fn color(&self, _: Point3<f32>) -> Rgb<u8> {
         self.color
     }
-    fn diffusion(&self, _point: Point3<f32>) -> f32 {
-        self.kd
+    fn propeties(&self, _: Point3<f32>) -> (f32, f32, f32) {
+        (self.kd, self.ks, self.ka)
     }
 }

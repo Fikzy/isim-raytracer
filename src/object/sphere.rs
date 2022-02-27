@@ -49,7 +49,7 @@ where
     fn get_color(&self, point: Point3<f32>) -> Rgb<u8> {
         self.texture.color(point)
     }
-    fn get_diffusion(&self, point: Point3<f32>) -> f32 {
-        self.texture.diffusion(point)
+    fn get_properties(&self, point: Point3<f32>) -> (f32, f32, f32) {
+        self.texture.propeties(point)
     }
 }
