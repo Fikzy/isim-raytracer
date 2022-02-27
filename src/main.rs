@@ -10,10 +10,13 @@ mod texture;
 use std::f32::consts::FRAC_PI_2;
 
 fn main() {
+    let width = 480;
+    let height = 270;
+
     let scene = scene::Scene {
         objects: vec![
             Box::new(object::sphere::Sphere {
-                center: na::point![0.0, 0.0, 2.0],
+                center: na::point![0.0, 0.0, 0.0],
                 radius: 0.5,
                 texture: texture::uniform::UniformTexture {
                     kd: 0.0,
@@ -23,7 +26,7 @@ fn main() {
                 },
             }),
             Box::new(object::sphere::Sphere {
-                center: na::point![1.0, 1.0, 2.0],
+                center: na::point![1.0, 1.0, 0.0],
                 radius: 0.5,
                 texture: texture::uniform::UniformTexture {
                     kd: 0.0,
@@ -33,7 +36,7 @@ fn main() {
                 },
             }),
             Box::new(object::sphere::Sphere {
-                center: na::point![-3.0, 0.0, 2.0],
+                center: na::point![-3.0, 0.0, 0.0],
                 radius: 1.0,
                 texture: texture::uniform::UniformTexture {
                     kd: 0.0,
@@ -45,14 +48,14 @@ fn main() {
         ],
         lights: vec![],
         camera: camera::Camera::new(
-            na::point![0.0, 0.0, 0.0],
+            na::point![0.0, 0.0, -2.0],
             na::vector![0.0, 1.0, 0.0],
-            na::point![0.0, 0.0, 1.0],
+            na::point![0.0, 0.0, 0.0],
             FRAC_PI_2,
             FRAC_PI_2,
             1.0,
         ),
     };
 
-    scene.save(480, 270);
+    scene.save_buffer(width, height).save("test.png").unwrap();
 }

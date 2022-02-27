@@ -1,5 +1,5 @@
 extern crate nalgebra as na;
-use image::{Rgb, RgbImage};
+use image::{ImageBuffer, Pixel, Rgb, RgbImage};
 
 use crate::ray::Ray;
 use crate::{camera::Camera, light::Light, object::Object};
@@ -11,10 +11,10 @@ pub struct Scene {
 }
 
 impl Scene {
-    pub fn save(&self, width: u32, height: u32) {
+    pub fn save_buffer(&self, width: u32, height: u32) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
         let mut img = RgbImage::from_pixel(width, height, Rgb([255, 255, 255]));
 
-        let world_space_basis = na::Rotation3::from_basis_unchecked(&[
+        let camera_basis = na::Rotation3::from_basis_unchecked(&[
             self.camera.right,
             self.camera.up,
             self.camera.forward,
@@ -33,7 +33,7 @@ impl Scene {
 
                 let ray = Ray {
                     origin: self.camera.position,
-                    direction: world_space_basis * ndc_ray_dir,
+                    direction: camera_basis * ndc_ray_dir,
                 };
 
                 let mut min: Option<f32> = None;
@@ -60,6 +60,6 @@ impl Scene {
             }
         }
 
-        img.save("test.png").unwrap();
+        img
     }
 }
