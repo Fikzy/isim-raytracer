@@ -14,6 +14,9 @@ impl Scene {
     pub fn save_buffer(&self, width: u32, height: u32) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
         let mut img = RgbImage::from_pixel(width, height, Rgb([255, 255, 255]));
 
+        let d = 1.0 / (self.camera.fov_x / 2.0).tan();
+        let aspect_ratio = width as f32 / height as f32;
+
         let camera_basis = na::Rotation3::from_basis_unchecked(&[
             self.camera.right,
             self.camera.up,
@@ -22,9 +25,6 @@ impl Scene {
 
         for x in 0..width {
             for y in 0..height {
-                let d = 1.0 / (self.camera.fov_x / 2.0).tan();
-                let aspect_ratio = width as f32 / height as f32;
-
                 let ndc_ray_dir = na::vector![
                     ((2.0 * (x as f32 + 0.5) / width as f32) - 1.0) * aspect_ratio,
                     -((2.0 * (y as f32 + 0.5) / height as f32) - 1.0),
@@ -53,9 +53,18 @@ impl Scene {
                 }
 
                 if min.is_some() && closest_obj.is_some() {
+                    let obj = closest_obj.unwrap();
                     let intersection_point =
                         self.camera.position + ray.direction.normalize() * min.unwrap();
-                    img.put_pixel(x, y, closest_obj.unwrap().find_texture(intersection_point));
+
+                    for light in &self.lights {
+                        let light_ray = light.get_position() - intersection_point;
+                        let coef = obj.normal(intersection_point).dot(&light_ray);
+
+                        let mut color = obj.find_texture(intersection_point);
+                        color.apply(|f| (f as f32 * coef).clamp(0.0, 255.0) as u8);
+                        img.put_pixel(x, y, color);
+                    }
                 }
             }
         }

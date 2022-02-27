@@ -46,9 +46,12 @@ fn main() {
                 },
             }),
         ],
-        lights: vec![],
+        lights: vec![Box::new(light::point::PointLight {
+            intensity: 1.0,
+            position: na::point![5.0, 5.0, -5.0],
+        })],
         camera: camera::Camera::new(
-            na::point![0.0, 0.0, -2.0],
+            na::point![0.0, 0.0, -3.0],
             na::vector![0.0, 1.0, 0.0],
             na::point![0.0, 0.0, 0.0],
             FRAC_PI_2,
