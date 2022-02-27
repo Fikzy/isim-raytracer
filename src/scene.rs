@@ -11,6 +11,20 @@ pub struct Scene {
 }
 
 impl Scene {
+    fn cast_ray(&self, ray: &Ray) -> Option<(f32, &Box<dyn Object>)> {
+        let mut intersection: Option<(f32, &Box<dyn Object>)> = None;
+
+        for object in &self.objects {
+            if let Some(d) = object.intersects(&ray) {
+                if intersection.is_none() || d < intersection.unwrap().0 {
+                    intersection = Some((d, object));
+                }
+            }
+        }
+
+        return intersection;
+    }
+
     pub fn save_buffer(&self, width: u32, height: u32) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
         let mut img = RgbImage::from_pixel(width, height, Rgb([0, 0, 0]));
 
@@ -36,26 +50,8 @@ impl Scene {
                     direction: camera_basis * ndc_ray_dir,
                 };
 
-                let mut min: Option<f32> = None;
-                let mut closest_obj: Option<&Box<dyn Object>> = None;
-
-                for object in &self.objects {
-                    let inter = object.intersects(&ray);
-                    match inter {
-                        Some(i) => {
-                            if min.is_none() || min.is_some() && i < min.unwrap() {
-                                min = inter;
-                                closest_obj = Some(object);
-                            }
-                        }
-                        None => (),
-                    }
-                }
-
-                if min.is_some() && closest_obj.is_some() {
-                    let obj = closest_obj.unwrap();
-                    let intersection_point =
-                        self.camera.position + ray.direction.normalize() * min.unwrap();
+                if let Some((d, obj)) = self.cast_ray(&ray) {
+                    let intersection_point = self.camera.position + ray.direction.normalize() * d;
 
                     for light in &self.lights {
                         let kd = obj.get_diffusion(intersection_point);
