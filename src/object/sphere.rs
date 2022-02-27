@@ -26,13 +26,21 @@ where
 
         let delta = b.powi(2) - 4.0 * a * c;
         if delta < 0.0 {
-            None
-        } else if delta == 0.0 {
-            Some(-b / (2.0 * a))
+            return None;
+        }
+
+        let r1 = (-b - (b.powi(2) - 4.0 * a * c).sqrt()) / (2.0 * a);
+        let r2 = (-b + (b.powi(2) - 4.0 * a * c).sqrt()) / (2.0 * a);
+
+        if delta == 0.0 && r2 > 0.0 {
+            Some(r1)
+        } else if delta > 0.0 {
+            [r1, r2]
+                .into_iter()
+                .filter(|t| t >= &0.0)
+                .min_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Less))
         } else {
-            let r1 = (-b - (b.powi(2) - 4.0 * a * c).sqrt()) / (2.0 * a);
-            let r2 = (-b + (b.powi(2) - 4.0 * a * c).sqrt()) / (2.0 * a);
-            Some(*na::partial_min(&r1, &r2).unwrap())
+            None
         }
     }
     fn normal(&self, point: Point3<f32>) -> Vector3<f32> {
