@@ -5,6 +5,5 @@ use image::Rgb;
 use na::Point3;
 
 pub trait TextureMaterial {
-    fn find(&self, point: Point3<f32>) -> (f32, f32, f32);
-    fn color(&self) -> Rgb<u8>;
+    fn find(&self, point: Point3<f32>) -> Rgb<u8>;
 }

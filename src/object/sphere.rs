@@ -38,10 +38,7 @@ where
     fn normal(&self, point: Point3<f32>) -> Vector3<f32> {
         (self.center - point).normalize()
     }
-    fn find_texture(&self, point: Point3<f32>) -> (f32, f32, f32) {
+    fn find_texture(&self, point: Point3<f32>) -> Rgb<u8> {
         self.texture.find(point)
-    }
-    fn get_color(&self) -> Rgb<u8> {
-        self.texture.color()
     }
 }

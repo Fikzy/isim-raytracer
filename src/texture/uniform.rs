@@ -14,10 +14,7 @@ pub struct UniformTexture {
 }
 
 impl TextureMaterial for UniformTexture {
-    fn find(&self, _point: Point3<f32>) -> (f32, f32, f32) {
-        (self.kd, self.ks, self.ka)
-    }
-    fn color(&self) -> Rgb<u8> {
+    fn find(&self, _point: Point3<f32>) -> Rgb<u8> {
         self.color
     }
 }

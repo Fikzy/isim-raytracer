@@ -14,21 +14,26 @@ impl Scene {
     pub fn save(&self, width: u32, height: u32) {
         let mut img = RgbImage::from_pixel(width, height, Rgb([255, 255, 255]));
 
+        let world_space_basis = na::Rotation3::from_basis_unchecked(&[
+            self.camera.right,
+            self.camera.up,
+            self.camera.forward,
+        ]);
+
         for x in 0..width {
             for y in 0..height {
                 let d = 1.0 / (self.camera.fov_x / 2.0).tan();
                 let aspect_ratio = width as f32 / height as f32;
 
-                let p_x = x as f32 + 0.5;
-                let p_y = y as f32 + 0.5;
+                let ndc_ray_dir = na::vector![
+                    ((2.0 * (x as f32 + 0.5) / width as f32) - 1.0) * aspect_ratio,
+                    -((2.0 * (y as f32 + 0.5) / height as f32) - 1.0),
+                    d
+                ];
 
                 let ray = Ray {
                     origin: self.camera.position,
-                    direction: na::vector![
-                        ((2.0 * p_x / width as f32) - 1.0) * aspect_ratio,
-                        1.0 - (2.0 * p_y / height as f32),
-                        d
-                    ],
+                    direction: world_space_basis * ndc_ray_dir,
                 };
 
                 let mut min: Option<f32> = None;
@@ -47,8 +52,10 @@ impl Scene {
                     }
                 }
 
-                if closest_obj.is_some() {
-                    img.put_pixel(x, y, closest_obj.unwrap().get_color());
+                if min.is_some() && closest_obj.is_some() {
+                    let intersection_point =
+                        self.camera.position + ray.direction.normalize() * min.unwrap();
+                    img.put_pixel(x, y, closest_obj.unwrap().find_texture(intersection_point));
                 }
             }
         }

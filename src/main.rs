@@ -54,5 +54,5 @@ fn main() {
         ),
     };
 
-    scene.save(256, 128);
+    scene.save(480, 270);
 }

@@ -21,8 +21,9 @@ impl Camera {
         fov_y: f32,
         z_min: f32,
     ) -> Camera {
+        let up = up.normalize();
         let forward: Vector3<f32> = (target - center).normalize();
-        let right: Vector3<f32> = forward.cross(&up).normalize();
+        let right: Vector3<f32> = up.cross(&forward).normalize();
         Camera {
             position: center,
             up,
