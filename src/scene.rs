@@ -51,13 +51,21 @@ impl Scene {
                 };
 
                 if let Some((d, obj)) = self.cast_ray(&ray) {
-                    let intersection_point = self.camera.position + ray.direction.normalize() * d;
+                    let inter_p = self.camera.position + ray.direction.normalize() * d;
 
                     for light in &self.lights {
-                        let kd = obj.get_diffusion(intersection_point);
-                        let mut c = obj.get_color(intersection_point);
-                        let light_ray = (light.get_position() - intersection_point).normalize();
-                        let nl = obj.normal(intersection_point).dot(&light_ray);
+                        let light_ray = Ray {
+                            origin: inter_p,
+                            direction: (light.get_position() - inter_p).normalize(),
+                        };
+
+                        if self.cast_ray(&light_ray).is_some() {
+                            continue;
+                        }
+
+                        let kd = obj.get_diffusion(inter_p);
+                        let mut c = obj.get_color(inter_p);
+                        let nl = obj.normal(inter_p).dot(&light_ray.direction);
                         let li = light.get_intensity();
 
                         c.apply(|f| ((kd * f as f32 * nl * li) as u8).clamp(0, 255));

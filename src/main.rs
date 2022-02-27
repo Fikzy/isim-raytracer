@@ -16,8 +16,8 @@ fn main() {
     let scene = scene::Scene {
         objects: vec![
             Box::new(object::sphere::Sphere {
-                center: na::point![5.0, 0.0, 0.0],
-                radius: 2.0,
+                center: na::point![0.0, 0.0, 0.0],
+                radius: 0.5,
                 texture: texture::uniform::UniformTexture {
                     kd: 1.0,
                     ks: 1.0,
@@ -26,8 +26,8 @@ fn main() {
                 },
             }),
             Box::new(object::sphere::Sphere {
-                center: na::point![5.0, 0.0, 3.0],
-                radius: 1.0,
+                center: na::point![-3.0, 0.0, 3.0],
+                radius: 2.0,
                 texture: texture::uniform::UniformTexture {
                     kd: 1.0,
                     ks: 1.0,
@@ -38,12 +38,12 @@ fn main() {
         ],
         lights: vec![Box::new(light::point::PointLight {
             intensity: 1.0,
-            position: na::point![0.0, 2.0, -3.0],
+            position: na::point![3.0, 0.0, -3.0],
         })],
         camera: camera::Camera::new(
-            na::point![0.0, 0.0, 0.0],
+            na::point![0.0, 0.0, -3.0],
             na::vector![0.0, 1.0, 0.0],
-            na::point![1.0, 0.0, 0.0],
+            na::point![0.0, 0.0, 0.0],
             FRAC_PI_2,
             FRAC_PI_2,
             1.0,
