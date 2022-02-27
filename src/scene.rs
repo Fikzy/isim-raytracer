@@ -58,12 +58,15 @@ impl Scene {
                         self.camera.position + ray.direction.normalize() * min.unwrap();
 
                     for light in &self.lights {
+                        let kd = obj.get_diffusion(intersection_point);
+                        let mut c = obj.get_color(intersection_point);
                         let light_ray = light.get_position() - intersection_point;
-                        let coef = obj.normal(intersection_point).dot(&light_ray);
+                        let nl = obj.normal(intersection_point).dot(&light_ray);
+                        let li = light.get_intensity();
 
-                        let mut color = obj.find_texture(intersection_point);
-                        color.apply(|f| (f as f32 * coef).clamp(0.0, 255.0) as u8);
-                        img.put_pixel(x, y, color);
+                        c.apply(|f| ((kd * f as f32 * nl * li) as u8).clamp(0, 255));
+
+                        img.put_pixel(x, y, c);
                     }
                 }
             }
