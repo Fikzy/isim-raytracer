@@ -12,7 +12,7 @@ pub struct Scene {
 
 impl Scene {
     pub fn save_buffer(&self, width: u32, height: u32) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
-        let mut img = RgbImage::from_pixel(width, height, Rgb([255, 255, 255]));
+        let mut img = RgbImage::from_pixel(width, height, Rgb([0, 0, 0]));
 
         let d = 1.0 / (self.camera.fov_x / 2.0).tan();
         let aspect_ratio = width as f32 / height as f32;
@@ -60,7 +60,7 @@ impl Scene {
                     for light in &self.lights {
                         let kd = obj.get_diffusion(intersection_point);
                         let mut c = obj.get_color(intersection_point);
-                        let light_ray = light.get_position() - intersection_point;
+                        let light_ray = (light.get_position() - intersection_point).normalize();
                         let nl = obj.normal(intersection_point).dot(&light_ray);
                         let li = light.get_intensity();
 
