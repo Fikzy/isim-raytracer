@@ -35,22 +35,21 @@ impl Scene {
         let forward = self.camera.forward;
         let right = self.camera.right;
         let up = self.camera.up;
-        let z_min = self.camera.z_min;
 
-        let gx = z_min * (self.camera.fov.to_radians() / 2.0).tan();
+        let gx = (self.camera.fov.to_radians() / 2.0).tan();
         let gy = gx * (m / k);
 
         let qx = 2.0 * gx / k * right;
         let qy = 2.0 * gy / m * up;
 
-        let p_top_left = self.camera.position + z_min * forward - gx * right + gy * up;
+        let p_top_left = self.camera.position + forward - gx * right + gy * up;
 
         for x in 0..width {
             for y in 0..height {
                 let p_pixel = p_top_left + qx * (x as f32 + 0.5) - qy * (y as f32 + 0.5);
 
                 let ray = Ray {
-                    origin: p_pixel,
+                    origin: self.camera.position,
                     direction: (p_pixel - self.camera.position).normalize(),
                 };
 
