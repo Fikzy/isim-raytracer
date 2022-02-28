@@ -65,18 +65,16 @@ impl Scene {
                         let s = d - 2.0 * (d.dot(&n)) * n;
 
                         let (kd, ks, _ka) = obj.get_properties(inter_p);
-                        let mut color = obj.get_color(inter_p);
                         let nl = n.dot(&light_ray.direction);
                         let li = light.get_intensity();
 
                         let id = kd * nl * li;
-                        let is = ks * li * s.dot(&light_ray.direction).powi(3);
+                        let is = ks * li * s.dot(&light_ray.direction).powi(5);
 
-                        let i = id + is;
+                        let mut pixel = obj.get_color(inter_p);
+                        pixel.apply(|c| ((c as f32 * id + is) as u8).clamp(0, 255));
 
-                        color.apply(|c| ((c as f32 * i) as u8).clamp(0, 255));
-
-                        img.put_pixel(x, y, color);
+                        img.put_pixel(x, y, pixel);
                     }
                 }
             }
