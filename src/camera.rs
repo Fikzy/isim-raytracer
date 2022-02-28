@@ -7,8 +7,7 @@ pub struct Camera {
     pub up: Vector3<f32>,
     pub forward: Vector3<f32>,
     pub right: Vector3<f32>,
-    pub fov_x: f32, // alpha
-    pub fov_y: f32, // beta
+    pub fov: f32,
     pub z_min: f32,
 }
 
@@ -17,8 +16,7 @@ impl Camera {
         center: Point3<f32>,
         up: Vector3<f32>,
         target: Point3<f32>,
-        fov_x: f32,
-        fov_y: f32,
+        fov: f32,
         z_min: f32,
     ) -> Camera {
         let forward: Vector3<f32> = (target - center).normalize();
@@ -29,8 +27,7 @@ impl Camera {
             up,
             forward,
             right,
-            fov_x,
-            fov_y,
+            fov,
             z_min,
         }
     }
