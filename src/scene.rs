@@ -29,24 +29,21 @@ impl Scene {
     pub fn save_buffer(&self, width: u32, height: u32) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
         let mut img = RgbImage::from_pixel(width, height, Rgb([0, 0, 0]));
 
-        let k = width as f32;
-        let m = height as f32;
-
         let forward = self.camera.forward;
         let right = self.camera.right;
         let up = self.camera.up;
 
         let gx = (self.camera.fov.to_radians() / 2.0).tan();
-        let gy = gx * (m / k);
+        let gy = gx * ((height - 1) as f32 / (width - 1) as f32);
 
-        let qx = 2.0 * gx / k * right;
-        let qy = 2.0 * gy / m * up;
+        let qx = 2.0 * gx / ((width - 1) as f32) * right;
+        let qy = 2.0 * gy / ((height - 1) as f32) * up;
 
         let p_top_left = self.camera.position + forward - gx * right + gy * up;
 
         for x in 0..width {
             for y in 0..height {
-                let p_pixel = p_top_left + qx * (x as f32 + 0.5) - qy * (y as f32 + 0.5);
+                let p_pixel = p_top_left + qx * (x as f32) - qy * (y as f32);
 
                 let ray = Ray {
                     origin: self.camera.position,

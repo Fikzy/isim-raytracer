@@ -86,7 +86,7 @@ fn main() {
         ],
         lights: vec![Box::new(light::point::PointLight {
             intensity: 1.0,
-            position: na::point![0.0, 0.0, -3.0],
+            position: na::point![2.0, 0.0, -3.0],
         })],
         camera: camera::Camera::new(
             na::point![0.0, 0.0, -3.0],
