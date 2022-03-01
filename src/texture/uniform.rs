@@ -1,9 +1,6 @@
-extern crate nalgebra as na;
-
-use image::Rgb;
-use na::Point3;
-
 use crate::texture::TextureMaterial;
+use image::Rgb;
+use nalgebra::Point3;
 
 #[derive(Debug)]
 pub struct UniformTexture {
@@ -11,6 +8,12 @@ pub struct UniformTexture {
     pub ks: f32,
     pub ka: f32,
     pub color: Rgb<u8>,
+}
+
+impl UniformTexture {
+    pub fn new(kd: f32, ks: f32, ka: f32, color: Rgb<u8>) -> Self {
+        UniformTexture { kd, ks, ka, color }
+    }
 }
 
 impl TextureMaterial for UniformTexture {

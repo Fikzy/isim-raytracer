@@ -1,6 +1,6 @@
-use nalgebra::Point3;
-
 pub mod point;
+
+use nalgebra::Point3;
 
 pub trait Light {
     fn get_intensity(&self) -> f32 {

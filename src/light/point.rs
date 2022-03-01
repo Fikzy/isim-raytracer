@@ -1,6 +1,5 @@
-use nalgebra::Point3;
-
 use super::Light;
+use nalgebra::Point3;
 
 #[derive(Debug)]
 pub struct PointLight {

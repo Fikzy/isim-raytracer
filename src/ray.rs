@@ -1,5 +1,4 @@
-extern crate nalgebra as na;
-use na::{Point3, Vector3};
+use nalgebra::{Point3, Vector3};
 
 #[derive(Debug)]
 pub struct Ray {

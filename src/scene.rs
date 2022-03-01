@@ -1,19 +1,16 @@
-extern crate nalgebra as na;
-
-use image::{ImageBuffer, Pixel, Rgb, RgbImage};
-
 use crate::ray::Ray;
 use crate::{camera::Camera, light::Light, object::Object};
+use image::{ImageBuffer, Pixel, Rgb, RgbImage};
 
 pub struct Scene {
-    pub objects: Vec<Box<dyn Object>>,
+    pub objects: Vec<Object>,
     pub lights: Vec<Box<dyn Light>>,
     pub camera: Camera,
 }
 
 impl Scene {
-    fn cast_ray(&self, ray: &Ray) -> Option<(f32, &Box<dyn Object>)> {
-        let mut intersection: Option<(f32, &Box<dyn Object>)> = None;
+    fn cast_ray(&self, ray: &Ray) -> Option<(f32, &Object)> {
+        let mut intersection: Option<(f32, &Object)> = None;
 
         for object in &self.objects {
             if let Some(d) = object.intersects(&ray) {
@@ -64,14 +61,14 @@ impl Scene {
                         let d = inter_p - ray.origin;
                         let s = d - 2.0 * (d.dot(&n)) * n;
 
-                        let (kd, ks, _ka) = obj.get_properties(inter_p);
+                        let (kd, ks, _ka) = obj.texture.propeties(inter_p);
                         let nl = n.dot(&light_ray.direction);
                         let li = light.get_intensity();
 
                         let id = kd * nl * li;
                         let is = ks * li * s.dot(&light_ray.direction).powi(5);
 
-                        let mut pixel = obj.get_color(inter_p);
+                        let mut pixel = obj.texture.color(inter_p);
                         pixel.apply(|c| ((c as f32 * id + is) as u8).clamp(0, 255));
 
                         img.put_pixel(x, y, pixel);

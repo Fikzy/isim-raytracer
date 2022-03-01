@@ -1,24 +1,21 @@
-extern crate nalgebra as na;
-use image::Rgb;
-use na::{Point3, Vector3};
-
-use crate::object::Object;
 use crate::ray::Ray;
-use crate::texture::TextureMaterial;
+use crate::shape::Shape;
+use nalgebra::{Point3, Vector3};
 
 #[derive(Debug)]
-pub struct Sphere<T: TextureMaterial> {
-    pub center: Point3<f32>,
+pub struct Sphere {
     pub radius: f32,
-    pub texture: T,
 }
 
-impl<T> Object for Sphere<T>
-where
-    T: TextureMaterial,
-{
-    fn intersects(&self, ray: &Ray) -> Option<f32> {
-        let oc = ray.origin - self.center;
+impl Sphere {
+    pub fn new(radius: f32) -> Self {
+        Sphere { radius }
+    }
+}
+
+impl Shape for Sphere {
+    fn intersects(&self, origin: &Point3<f32>, ray: &Ray) -> Option<f32> {
+        let oc = ray.origin - origin;
 
         let a = ray.direction.dot(&ray.direction);
         let b = 2.0 * oc.dot(&ray.direction);
@@ -43,13 +40,7 @@ where
             None
         }
     }
-    fn normal(&self, point: Point3<f32>) -> Vector3<f32> {
-        (point - self.center).normalize()
-    }
-    fn get_color(&self, point: Point3<f32>) -> Rgb<u8> {
-        self.texture.color(point)
-    }
-    fn get_properties(&self, point: Point3<f32>) -> (f32, f32, f32) {
-        self.texture.propeties(point)
+    fn normal(&self, origin: &Point3<f32>, point: Point3<f32>) -> Vector3<f32> {
+        (point - origin).normalize()
     }
 }
