@@ -51,10 +51,19 @@ impl Scene {
                     let inter_p = ray.origin + ray.direction.normalize() * d;
 
                     for light in &self.lights {
+                        let lr = light.get_position() - inter_p;
+                        let lr_dist = lr.norm();
+                        let lr_dir = lr.normalize();
+
                         let light_ray = Ray {
-                            origin: inter_p,
-                            direction: (light.get_position() - inter_p).normalize(),
+                            origin: inter_p + lr_dir * 0.0001,
+                            direction: lr_dir,
                         };
+                        if let Some((lr_inter_d, _)) = self.cast_ray(&light_ray) {
+                            if lr_inter_d <= lr_dist {
+                                continue;
+                            }
+                        }
 
                         let normal = obj.normal(inter_p);
 
@@ -63,11 +72,11 @@ impl Scene {
                             .normalize();
 
                         let (kd, ks, _ka) = obj.texture.propeties(inter_p);
-                        let nl = normal.dot(&light_ray.direction);
+                        let nl = normal.dot(&lr_dir);
                         let li = light.get_intensity();
 
                         let id = kd * nl * li;
-                        let is = ks * li * reflected.dot(&light_ray.direction).powi(15);
+                        let is = ks * li * reflected.dot(&lr_dir).powi(15);
 
                         let mut pixel = obj.texture.color(inter_p);
                         pixel.apply(|c| (c as f32 * id + is * 255.0).clamp(0.0, 255.0) as u8);
