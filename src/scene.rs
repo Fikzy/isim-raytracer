@@ -56,20 +56,21 @@ impl Scene {
                             direction: (light.get_position() - inter_p).normalize(),
                         };
 
-                        let n = obj.normal(inter_p);
+                        let normal = obj.normal(inter_p);
 
-                        let d = inter_p - ray.origin;
-                        let s = d - 2.0 * (d.dot(&n)) * n;
+                        let reflected = (ray.direction
+                            - 2.0 * (ray.direction.dot(&normal)) * normal)
+                            .normalize();
 
                         let (kd, ks, _ka) = obj.texture.propeties(inter_p);
-                        let nl = n.dot(&light_ray.direction);
+                        let nl = normal.dot(&light_ray.direction);
                         let li = light.get_intensity();
 
                         let id = kd * nl * li;
-                        let is = ks * li * s.dot(&light_ray.direction).powi(5);
+                        let is = ks * li * reflected.dot(&light_ray.direction).powi(15);
 
                         let mut pixel = obj.texture.color(inter_p);
-                        pixel.apply(|c| ((c as f32 * id + is) as u8).clamp(0, 255));
+                        pixel.apply(|c| (c as f32 * id + is * 255.0).clamp(0.0, 255.0) as u8);
 
                         img.put_pixel(x, y, pixel);
                     }
