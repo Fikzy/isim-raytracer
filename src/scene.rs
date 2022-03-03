@@ -9,6 +9,7 @@ pub struct Scene {
     pub camera: Camera,
 }
 
+const NS: i32 = 50;
 const REFLECT_ITER: u8 = 15;
 
 impl Scene {
@@ -26,7 +27,7 @@ impl Scene {
         return intersection;
     }
 
-    fn cast_ray(&self, ray: &Ray, iter: u8) -> Vector3<f32> {
+    fn cast_ray(&self, ray: &Ray, depth: f32, iter: u8) -> Vector3<f32> {
         let mut color = Vector3::from_element(0.0);
 
         if let Some((d, obj)) = self.check_intersection(&ray) {
@@ -41,11 +42,6 @@ impl Scene {
                     origin: inter_p + lr_dir * 0.0001,
                     direction: lr_dir,
                 };
-                if let Some((lr_inter_d, _)) = self.check_intersection(&light_ray) {
-                    if lr_inter_d <= lr_dist {
-                        continue;
-                    }
-                }
 
                 let normal = obj.normal(inter_p);
 
@@ -54,22 +50,31 @@ impl Scene {
 
                 let (kd, ks, _ka) = obj.texture.propeties(inter_p);
                 let nl = normal.dot(&lr_dir);
-                let li = light.get_intensity();
+                let mut li = light.get_intensity();
 
-                let id = kd * nl * li;
-                let is = ks * li * reflect_dir.dot(&lr_dir).powi(15);
+                if let Some((lr_inter_d, _)) = self.check_intersection(&light_ray) {
+                    if lr_inter_d <= lr_dist {
+                        li = 0.0;
+                    }
+                }
 
-                color += (obj.texture.color(inter_p) * id)
-                    + Vector3::from_element((is * 255.0).clamp(0.0, 255.0));
+                let id = kd * obj.texture.color(inter_p) * nl * li;
+                let is = Vector3::from_element(ks * li * reflect_dir.dot(&lr_dir).powi(NS) * 255.0);
+
+                let mut p_color = id + is;
+                p_color *= 1.0 / (depth + d);
 
                 if iter < REFLECT_ITER {
                     let reflect_ray = Ray {
                         origin: inter_p + reflect_dir * 0.0001,
                         direction: reflect_dir,
                     };
-                    let reflect_color = self.cast_ray(&reflect_ray, iter + 1);
-                    color += reflect_color / (1 + iter) as f32;
+                    let s_color = self.cast_ray(&reflect_ray, depth + d, iter + 1);
+
+                    p_color += ks as f32 * s_color;
                 }
+
+                color += p_color;
             }
         }
 
@@ -100,7 +105,7 @@ impl Scene {
                     direction: (p_pixel - self.camera.position).normalize(),
                 };
 
-                let color = self.cast_ray(&ray, 0);
+                let color = self.cast_ray(&ray, 0.0, 0);
                 img.put_pixel(x, y, Rgb([color.x as u8, color.y as u8, color.z as u8]));
             }
         }
