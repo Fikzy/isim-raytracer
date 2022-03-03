@@ -1,6 +1,7 @@
 use crate::ray::Ray;
 use crate::{camera::Camera, light::Light, object::Object};
-use image::{ImageBuffer, Pixel, Rgb, RgbImage};
+use image::{ImageBuffer, Rgb, RgbImage};
+use nalgebra::Vector3;
 
 pub struct Scene {
     pub objects: Vec<Object>,
@@ -8,8 +9,10 @@ pub struct Scene {
     pub camera: Camera,
 }
 
+const REFLECT_ITER: u8 = 15;
+
 impl Scene {
-    fn cast_ray(&self, ray: &Ray) -> Option<(f32, &Object)> {
+    fn check_intersection(&self, ray: &Ray) -> Option<(f32, &Object)> {
         let mut intersection: Option<(f32, &Object)> = None;
 
         for object in &self.objects {
@@ -21,6 +24,57 @@ impl Scene {
         }
 
         return intersection;
+    }
+
+    fn cast_ray(&self, ray: &Ray, iter: u8) -> Vector3<f32> {
+        let mut color = Vector3::from_element(0.0);
+
+        if let Some((d, obj)) = self.check_intersection(&ray) {
+            let inter_p = ray.origin + ray.direction.normalize() * d;
+
+            for light in &self.lights {
+                let lr = light.get_position() - inter_p;
+                let lr_dist = lr.norm();
+                let lr_dir = lr.normalize();
+
+                let light_ray = Ray {
+                    origin: inter_p + lr_dir * 0.0001,
+                    direction: lr_dir,
+                };
+                if let Some((lr_inter_d, _)) = self.check_intersection(&light_ray) {
+                    if lr_inter_d <= lr_dist {
+                        continue;
+                    }
+                }
+
+                let normal = obj.normal(inter_p);
+
+                let reflect_dir =
+                    (ray.direction - 2.0 * (ray.direction.dot(&normal)) * normal).normalize();
+
+                let (kd, ks, _ka) = obj.texture.propeties(inter_p);
+                let nl = normal.dot(&lr_dir);
+                let li = light.get_intensity();
+
+                let id = kd * nl * li;
+                let is = ks * li * reflect_dir.dot(&lr_dir).powi(15);
+
+                color += (obj.texture.color(inter_p) * id)
+                    + Vector3::from_element((is * 255.0).clamp(0.0, 255.0));
+
+                if iter < REFLECT_ITER {
+                    let reflect_ray = Ray {
+                        origin: inter_p + reflect_dir * 0.0001,
+                        direction: reflect_dir,
+                    };
+                    let reflect_color = self.cast_ray(&reflect_ray, iter + 1);
+                    color += reflect_color / (1 + iter) as f32;
+                }
+            }
+        }
+
+        color.apply(|c| *c = c.clamp(0.0, 255.0));
+        color
     }
 
     pub fn save_buffer(&self, width: u32, height: u32) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
@@ -41,49 +95,13 @@ impl Scene {
         for x in 0..width {
             for y in 0..height {
                 let p_pixel = p_top_left + qx * (x as f32) - qy * (y as f32);
-
                 let ray = Ray {
                     origin: self.camera.position,
                     direction: (p_pixel - self.camera.position).normalize(),
                 };
 
-                if let Some((d, obj)) = self.cast_ray(&ray) {
-                    let inter_p = ray.origin + ray.direction.normalize() * d;
-
-                    for light in &self.lights {
-                        let lr = light.get_position() - inter_p;
-                        let lr_dist = lr.norm();
-                        let lr_dir = lr.normalize();
-
-                        let light_ray = Ray {
-                            origin: inter_p + lr_dir * 0.0001,
-                            direction: lr_dir,
-                        };
-                        if let Some((lr_inter_d, _)) = self.cast_ray(&light_ray) {
-                            if lr_inter_d <= lr_dist {
-                                continue;
-                            }
-                        }
-
-                        let normal = obj.normal(inter_p);
-
-                        let reflected = (ray.direction
-                            - 2.0 * (ray.direction.dot(&normal)) * normal)
-                            .normalize();
-
-                        let (kd, ks, _ka) = obj.texture.propeties(inter_p);
-                        let nl = normal.dot(&lr_dir);
-                        let li = light.get_intensity();
-
-                        let id = kd * nl * li;
-                        let is = ks * li * reflected.dot(&lr_dir).powi(15);
-
-                        let mut pixel = obj.texture.color(inter_p);
-                        pixel.apply(|c| (c as f32 * id + is * 255.0).clamp(0.0, 255.0) as u8);
-
-                        img.put_pixel(x, y, pixel);
-                    }
-                }
+                let color = self.cast_ray(&ray, 0);
+                img.put_pixel(x, y, Rgb([color.x as u8, color.y as u8, color.z as u8]));
             }
         }
 
