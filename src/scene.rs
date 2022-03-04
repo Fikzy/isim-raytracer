@@ -10,7 +10,7 @@ pub struct Scene {
 }
 
 const NS: i32 = 50;
-const REFLECT_ITER: u8 = 15;
+const REFLECT_ITER: u8 = 5;
 
 impl Scene {
     fn check_intersection(&self, ray: &Ray) -> Option<(f32, &Object)> {
