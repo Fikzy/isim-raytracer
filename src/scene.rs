@@ -2,15 +2,17 @@ use crate::ray::Ray;
 use crate::{camera::Camera, light::Light, object::Object};
 use image::{ImageBuffer, Rgb, RgbImage};
 use nalgebra::Vector3;
+use rand::Rng;
 
 pub struct Scene {
     pub objects: Vec<Object>,
-    pub lights: Vec<Box<dyn Light>>,
+    pub lights: Vec<Light>,
     pub camera: Camera,
 }
 
 const NS: i32 = 50;
 const REFLECT_ITER: u8 = 5;
+const SPHERE_LIGHT_SAMPLING: u8 = 10;
 
 impl Scene {
     fn check_intersection(&self, ray: &Ray) -> Option<(f32, &Object)> {
@@ -50,13 +52,44 @@ impl Scene {
 
                 let (kd, ks, _ka) = obj.texture.propeties(inter_p);
                 let nl = normal.dot(&lr_dir);
-                let mut li = light.get_intensity();
-
-                if let Some((lr_inter_d, _)) = self.check_intersection(&light_ray) {
-                    if lr_inter_d <= lr_dist {
-                        li = 0.0;
+                let li = match light {
+                    &Light::PointLight {
+                        position: _,
+                        intensity,
+                    } => match self.check_intersection(&light_ray) {
+                        Some((lr_inter_d, _)) if lr_inter_d <= lr_dist => 0.0,
+                        Some(_) | None => intensity,
+                    },
+                    &Light::SphereLight {
+                        position,
+                        intensity,
+                        radius,
+                    } => {
+                        let mut visible_count = 0;
+                        let lr_i = if lr_dir.z < lr_dir.x {
+                            na::vector![lr_dir.y, -lr_dir.x, 0.0]
+                        } else {
+                            na::vector![0.0, -lr_dir.z, lr_dir.y]
+                        };
+                        let lr_j = lr_dir.cross(&lr_i);
+                        let mut rng = rand::thread_rng();
+                        for _ in 0..SPHERE_LIGHT_SAMPLING {
+                            let dx = rng.gen_range(-radius..=radius);
+                            let dy = rng.gen_range(-radius..=radius);
+                            let random_point = position + dx * lr_i + dy * lr_j;
+                            let random_lr_dir = (random_point - inter_p).normalize();
+                            let random_lr = Ray {
+                                origin: inter_p + random_lr_dir * 0.0001,
+                                direction: random_lr_dir,
+                            };
+                            visible_count += match self.check_intersection(&random_lr) {
+                                Some((lr_inter_d, _)) if lr_inter_d <= lr_dist => 0,
+                                Some(_) | None => 1,
+                            };
+                        }
+                        intensity * (visible_count as f32 / SPHERE_LIGHT_SAMPLING as f32)
                     }
-                }
+                };
 
                 let id = kd * obj.texture.color(inter_p) * nl * li;
                 let is = Vector3::from_element(ks * li * reflect_dir.dot(&lr_dir).powi(NS) * 255.0);
