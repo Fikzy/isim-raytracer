@@ -43,25 +43,14 @@ fn main() {
                     na::vector![255, 255, 255],
                 )),
             },
-            Object {
-                position: na::point![0.0, 0.0, 3.0],
-                shape: Box::new(Plane::new(na::vector![0.0, 0.0, -1.0])),
-                texture: Box::new(UniformTexture::new(1.0, 0.1, 1.0, na::vector![0, 0, 255])),
-            },
-            // Object {
-            //     position: na::point![-3.0, 0.0, 0.0],
-            //     shape: Box::new(Plane::new(na::vector![0.0, 1.0, -1.0])),
-            //     texture: Box::new(UniformTexture::new(1.0, 0.1, 1.0, na::vector![0, 0, 255])),
-            // },
         ],
         lights: vec![
-            Light::SphereLight {
+            Light::PointLight {
                 position: na::point![1.0, 3.0, -3.0],
                 intensity: 2.0,
-                radius: 1.0,
             },
             Light::SphereLight {
-                position: na::point![1.0, 3.0, -1.0],
+                position: na::point![1.0, 3.0, 3.0],
                 intensity: 2.0,
                 radius: 1.0,
             },
@@ -74,5 +63,10 @@ fn main() {
         ),
     };
 
+    let now = std::time::Instant::now();
+
     scene.save_buffer(width, height).save("test.png").unwrap();
+
+    let elapsed_time = now.elapsed();
+    println!("Took {} seconds.", elapsed_time.as_secs());
 }
