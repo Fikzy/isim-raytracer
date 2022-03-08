@@ -5,6 +5,7 @@ mod ray;
 mod scene;
 mod shape;
 mod texture;
+mod utils;
 
 extern crate nalgebra as na;
 use light::Light;
@@ -45,9 +46,10 @@ fn main() {
             },
         ],
         lights: vec![
-            Light::PointLight {
+            Light::SphereLight {
                 position: na::point![1.0, 3.0, -3.0],
                 intensity: 2.0,
+                radius: 1.0,
             },
             Light::SphereLight {
                 position: na::point![1.0, 3.0, 3.0],

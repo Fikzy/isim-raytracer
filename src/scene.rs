@@ -1,8 +1,8 @@
 use crate::ray::Ray;
+use crate::utils;
 use crate::{camera::Camera, light::Light, object::Object};
 use image::{ImageBuffer, Rgb, RgbImage};
 use nalgebra::Vector3;
-use rand::Rng;
 
 pub struct Scene {
     pub objects: Vec<Object>,
@@ -12,7 +12,7 @@ pub struct Scene {
 
 const NS: i32 = 50;
 const REFLECT_ITER: u8 = 5;
-const SPHERE_LIGHT_SAMPLING: u8 = 10;
+const SPHERE_LIGHT_SAMPLING: u8 = 20;
 
 impl Scene {
     fn check_intersection(&self, ray: &Ray) -> Option<(f32, &Object)> {
@@ -72,11 +72,14 @@ impl Scene {
                             na::vector![0.0, -lr_dir.z, lr_dir.y]
                         };
                         let lr_j = lr_dir.cross(&lr_i);
-                        let mut rng = rand::thread_rng();
-                        for _ in 0..SPHERE_LIGHT_SAMPLING {
-                            let dx = rng.gen_range(-radius..=radius);
-                            let dy = rng.gen_range(-radius..=radius);
-                            let random_point = position + dx * lr_i + dy * lr_j;
+                        for i in 0..SPHERE_LIGHT_SAMPLING {
+                            let vogel_point = utils::get_vogel_disk_sample(
+                                i.into(),
+                                SPHERE_LIGHT_SAMPLING.into(),
+                                radius,
+                            );
+                            let random_point =
+                                position + vogel_point.x * lr_i + vogel_point.y * lr_j;
                             let random_lr_dir = (random_point - inter_p).normalize();
                             let random_lr = Ray {
                                 origin: inter_p + random_lr_dir * 0.0001,
