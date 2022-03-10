@@ -27,7 +27,7 @@ impl Shape for Triangle {
 
         if let Some(inv) = o_basis.try_inverse() {
             let coefs = inv * ray.direction;
-            if coefs.into_iter().all(|c| c >= &0.0) || coefs.into_iter().all(|c| c <= &0.0) {
+            if coefs.into_iter().all(|c| c >= &0.0) {
                 let og = (coefs.x * o_vectors[0] + coefs.y * o_vectors[1] + coefs.z * o_vectors[2])
                     / coefs.sum();
                 Some(og.norm())

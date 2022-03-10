@@ -38,8 +38,8 @@ fn main() {
                 position: na::Point3::origin(),
                 shape: Box::new(Triangle::new([
                     na::point![0.0, 0.0, 0.0],
-                    na::point![-0.5, 1.0, 0.0],
-                    na::point![0.5, 1.0, 1.0],
+                    na::point![-0.5, 1.0, -0.5],
+                    na::point![0.5, 1.0, 0.5],
                 ])),
                 texture: Box::new(UniformTexture::new(1.0, 0.1, 1.0, na::vector![255, 0, 255])),
             },
