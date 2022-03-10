@@ -45,7 +45,7 @@ impl Scene {
                     direction: lr_dir,
                 };
 
-                let normal = obj.normal(inter_p);
+                let normal = obj.normal(&inter_p, ray);
 
                 let reflect_dir =
                     (ray.direction - 2.0 * (ray.direction.dot(&normal)) * normal).normalize();

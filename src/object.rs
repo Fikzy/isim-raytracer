@@ -11,7 +11,7 @@ impl Object {
     pub fn intersects(&self, ray: &Ray) -> Option<f32> {
         self.shape.intersects(&self.position, ray)
     }
-    pub fn normal(&self, point: Point3<f32>) -> Vector3<f32> {
-        self.shape.normal(&self.position, point)
+    pub fn normal(&self, point: &Point3<f32>, ray: &Ray) -> Vector3<f32> {
+        self.shape.normal(&self.position, point, ray)
     }
 }

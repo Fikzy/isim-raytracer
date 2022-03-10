@@ -27,8 +27,9 @@ impl Shape for Plane {
     fn normal(
         &self,
         _origin: &nalgebra::Point3<f32>,
-        _point: nalgebra::Point3<f32>,
+        _point: &nalgebra::Point3<f32>,
+        ray: &crate::ray::Ray,
     ) -> Vector3<f32> {
-        self.normal
+        self.normal * -self.normal.dot(&ray.direction).signum()
     }
 }

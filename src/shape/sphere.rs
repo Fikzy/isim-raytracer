@@ -40,7 +40,12 @@ impl Shape for Sphere {
             None
         }
     }
-    fn normal(&self, origin: &Point3<f32>, point: Point3<f32>) -> Vector3<f32> {
+    fn normal(
+        &self,
+        origin: &Point3<f32>,
+        point: &Point3<f32>,
+        _ray: &crate::ray::Ray,
+    ) -> Vector3<f32> {
         (point - origin).normalize()
     }
 }
